@@ -69,17 +69,16 @@ int main(int argc, char *argv[])
 			cur = 0;
 			continue;
 		}
-		
 		cur = cur * 10 + (int)argv[1][i] - 48;
 
-
-
+		if (cur > MAX_CORE_COUNT - 1)
+			return EXIT_FAILURE;
 	}
 
 	tmp = tmp < 0 ? cur : tmp ;
-	set_cores(c, tmp, cur, 1) ; 
+	set_cores(c, tmp, cur, 1) ;
 	
 	show(c);
-
+	free(c);
 	return EXIT_SUCCESS;
 }
