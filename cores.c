@@ -1,82 +1,85 @@
-
 #include <stdio.h>
-#include <string.h>
-#include <sys/sysinfo.h>
+#include <malloc.h>
 
-typedef unsigned char mask;
+#define MAX_CORE_COUNT 1024
 
-void set_mask(int begin, int end, mask *m)
+typedef unsigned int core;
+typedef struct{
+	char map[MAX_CORE_COUNT];
+	core last;
+
+} coreset;
+
+
+int core_exits(coreset *c, core n)
 {
-	if (begin > end)
-	{
-		end += begin;
-		begin = end - begin;
-		end -= begin;
-	}
-
-	for (int offset=0, i = begin; i <= end; ++i)
-	{
-		int offset = i / sizeof(mask);
-		m[offset] |= 1 << (i%sizeof(mask));
-	}
+	return c->map[n] != 0 ;
 }
 
-void split(char *s, mask *m)
+void set_cores(coreset *c, core b, core e, char stat)
 {
-	int begin = -1, end = -1;
-	unsigned int tmp = 0;
-	for (int i = 0; i <= strlen(s); i++)
+	if (b>e)
 	{
-		if (47 < s[i] && s[i] < 58)
-		{
-			tmp *= 10;
-			tmp += s[i] - 48;
-			continue;
-		}
-
-		end = tmp;
-		if (begin == -1)
-		{
-			begin = tmp;
-		}
-
-		if (45 != s[i] )
-		{
-			set_mask(begin, end, m);
-			begin = -1;
-		}
-
-		tmp = 0;
+		core t = b;
+		b=e;
+		e = b;
 	}
+	c->last = c->last > e ? c->last : e;
+	do 
+	{
+		c->map[b] = stat;
+		b ++;
+	}while(b <= e );
 
+}
+
+void show(coreset *c)
+{
+	for (int i=0; i<= c->last; i++) 
+	{
+		if (core_exits(c, i))
+			printf("%d\n", i);
+	}
 }
 
 int main(int argc, char *argv[])
 {
 	if (argc == 1)
+		return EXIT_SUCCESS;
+
+	coreset *c = {malloc(MAX_CORE_COUNT), 0};
+	
+	core cur=0;
+	int tmp = -1;
+	for (int i=0; argv[1][i] != '\0'; ++i)
 	{
-		return 0;
-	}
-
-	size_t core_count = get_nprocs_conf();
-	size_t mask_length = core_count / sizeof(mask);
-
-	mask core_mask[mask_length];
-	for (int i = 0; i < mask_length; ++i)
-	{
-		core_mask[i] = 0;
-	}
-
-	split(argv[1], core_mask);
-
-	for (int offset = 0, i = 0; i < core_count; ++i)
-	{
-		offset = i / sizeof(mask);
-		if (core_mask[offset] & (1 << (i%sizeof(mask))))
+		if (argv[1][i] == ',')
 		{
-			printf("%d\n", i);
+			tmp = tmp < 0 ? cur : tmp ;
+			set_cores(c, tmp, cur, 1);
+			
+			tmp = -1;
+			cur = 0;
+			continue;
 		}
+
+		if (argv[1][i] == '-')
+		{
+			tmp = cur;
+			cur = 0;
+			continue;
+		}
+		
+		cur = cur * 10 + (int)argv[1][i] - 48;
+
+
+
 	}
 
-	return 0;
+	tmp = tmp < 0 ? cur : tmp ;
+	set_cores(c, tmp, cur, 1) ; 
+	
+	show(c);
+
+	return EXIT_SUCCESS;
 }
