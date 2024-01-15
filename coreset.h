@@ -20,56 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <stdio.h>
-#include <malloc.h>
-#include <unistd.h>
-#include "coreset.h"
+#define MAX_CORE_COUNT 1024
+typedef unsigned int core;
+typedef struct{
+	char map[MAX_CORE_COUNT];
+	core last;
 
+} coreset;
 
-void usage()
-{
-	printf("Usage:\n");
-	printf("coreset -c <string> [-s|-m|-r] \n");
-}
+int coreset_from_char(coreset *c, char *s);
 
-int main(int argc, char *argv[])
-{
-	if (argc == 1)
-	{
-		usage();
-		return EXIT_SUCCESS;
-	}
+int core_exits(coreset *c, core n);
+void set_cores(coreset *c, core b, core e, char stat);
+void show(coreset *c);
+void print(coreset *c);
+void show_mask(coreset *c);
 
-	int option;
-	coreset *c = malloc(sizeof(coreset));
-	while ((option = getopt(argc, argv, "c:s::m::r::")) != -1)
-	{
-		switch (option)
-		{
-			case 'c':
-				if (coreset_from_char(c, optarg) != 0)
-					return EXIT_FAILURE;
-				break;
-			case 's':
-				print(c);
-				free(c);
-				return EXIT_SUCCESS;
-
-			case 'm':
-				show_mask(c);
-				free(c);
-				return EXIT_SUCCESS;
-
-			case '?':
-				usage();
-				return EXIT_SUCCESS;
-				
-		}
-	}
-
-	show(c);
-	free(c);
-
-	return EXIT_SUCCESS;
-	
-}
