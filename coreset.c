@@ -26,7 +26,7 @@
 
 typedef unsigned int core;
 typedef struct{
-	char map[MAX_CORE_COUNT];
+	_Bool map[MAX_CORE_COUNT];
 	core last;
 
 } coreset;
@@ -44,7 +44,7 @@ inline void set_cores(coreset *c, core b, core e, char stat)
 	{
 		core t = b;
 		b = e;
-		e = b;
+		e = t;
 	}
 	c->last = c->last > e ? c->last : e;
 	do 
