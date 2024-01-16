@@ -23,7 +23,7 @@
 #define MAX_CORE_COUNT 1024
 typedef unsigned int core;
 typedef struct{
-	char map[MAX_CORE_COUNT];
+	_Bool map[MAX_CORE_COUNT];
 	core last;
 
 } coreset;
