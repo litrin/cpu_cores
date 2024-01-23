@@ -31,7 +31,7 @@
 void usage()
 {
 	printf("Usage:\n");
-	printf("coreset -c <string> [-s|-m|-r] \n");
+	printf("coreset -c <string> [-s|-m|-r|-n] \n");
 }
 
 int main(int argc, char *argv[])
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
 	int option;
 	coreset *c = malloc(sizeof(coreset));
-	while ((option = getopt(argc, argv, "c:s::m::r::")) != -1)
+	while ((option = getopt(argc, argv, "c:s::m::r::n::")) != -1)
 	{
 		switch (option)
 		{
@@ -52,6 +52,10 @@ int main(int argc, char *argv[])
 				if (coreset_from_char(c, optarg) != 0)
 					return EXIT_FAILURE;
 				break;
+			case 'n':
+				printf("%d\n", core_count(c));
+				free(c);
+				return EXIT_SUCCESS;
 			case 's':
 				print(c);
 				free(c);

@@ -29,6 +29,7 @@ typedef struct{
 } coreset;
 
 int coreset_from_char(coreset *c, char *s);
+int core_count(coreset *c);
 
 int core_exits(coreset *c, core n);
 void set_cores(coreset *c, core b, core e, char stat);

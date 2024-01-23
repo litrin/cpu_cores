@@ -31,14 +31,12 @@ typedef struct{
 
 } coreset;
 
-int core_exits(coreset *c, core n);
-inline int core_exits(coreset *c, core n)
+static inline int core_exits(coreset *c, core n)
 {
 	return c->map[n] != 0 ;
 }
 
-void set_cores(coreset *c, core b, core e, char stat);
-inline void set_cores(coreset *c, core b, core e, char stat)
+static inline void set_cores(coreset *c, core b, core e, char stat)
 {
 	if (b>e)
 	{
@@ -53,6 +51,15 @@ inline void set_cores(coreset *c, core b, core e, char stat)
 		b ++;
 	}while(b <= e );
 
+}
+
+int core_count(coreset *c)
+{
+	int n = 0;
+	for (int i =0 ; i <= c->last; ++i)
+		if (core_exits(c, i)) n++;
+
+	return n;
 }
 
 int coreset_from_char(coreset *c, char *s)
@@ -90,8 +97,6 @@ int coreset_from_char(coreset *c, char *s)
 	return 0;
 
 }
-
-
 
 void show(coreset *c)
 {
